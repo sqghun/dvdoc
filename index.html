@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>DocuPulse — Digitalização de Documentos Hospitalares</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="phone">
+    <header class="app-header">
+      <div class="logo">Docu<span>Pulse</span></div>
+      <div class="header-sub" id="headerSub">Prontuário Eletrônico</div>
+    </header>
+
+    <main id="app">
+      <!-- ============ TELA 1: LOGIN ============ -->
+      <section class="screen active" id="screen-login">
+        <div class="login-hero">
+          <div class="hospital-icon">🏥</div>
+          <h1>Central de Digitalização</h1>
+          <p>Vincule documentos físicos ao Prontuário Eletrônico do paciente.</p>
+        </div>
+        <form id="loginForm" class="form">
+          <label>Usuário
+            <input type="text" id="userInput" placeholder="ex.: carla.mendes" autocomplete="username" />
+          </label>
+          <label>Senha
+            <input type="password" id="passInput" placeholder="••••••••" autocomplete="current-password" />
+          </label>
+          <button type="submit" class="btn btn-primary">Entrar</button>
+        </form>
+        <div class="divider"><span>ou</span></div>
+        <button class="btn btn-biometric" id="biometricBtn">
+          <span class="bio-icon">🫆</span> Login com Biometria
+        </button>
+        <p class="biometric-hint">Simulado — avança direto como profissional autenticado.</p>
+      </section>
+
+      <!-- ============ TELA 2: PULSEIRA ============ -->
+      <section class="screen" id="screen-pulseira">
+        <div class="prof-badge" id="profBadge">Enf. Carla Mendes · UTI</div>
+        <h2>Leitura da Pulseira</h2>
+        <p class="muted">Escaneie a pulseira do paciente para abrir o prontuário.</p>
+
+        <div class="scanner-box">
+          <div class="scan-line"></div>
+          <div class="scanner-icon">▮▮▮▮▯▮▮</div>
+          <p id="scanStatus">Aguardando leitura…</p>
+        </div>
+
+        <div class="sim-panel">
+          <label>Paciente fictício para simular:</label>
+          <div class="patient-chips" id="patientChips"></div>
+          <button class="btn btn-primary" id="simulateScanBtn">Simular Leitura de Pulseira</button>
+        </div>
+
+        <div class="patient-card hidden" id="patientCard">
+          <h3 id="pcName">—</h3>
+          <dl>
+            <dt>Leito</dt><dd id="pcBed">—</dd>
+            <dt>Prontuário</dt><dd id="pcKey" class="mono">—</dd>
+            <dt>Tipo sanguíneo</dt><dd id="pcBlood">—</dd>
+          </dl>
+          <button class="btn btn-success" id="goScanBtn">Escanear Documento</button>
+        </div>
+      </section>
+
+      <!-- ============ TELA 3: ESCANEAR ============ -->
+      <section class="screen" id="screen-scan">
+        <button class="btn-back" data-go="pulseira">‹ Voltar</button>
+        <h2>Escanear Documento</h2>
+        <div class="patient-mini" id="patientMini"></div>
+
+        <div class="capture-area" id="captureArea">
+          <input type="file" id="fileInput" accept="image/*" hidden />
+          <div class="capture-placeholder" id="capturePlaceholder">
+            <div class="cam-icon">📷</div>
+            <p>Toque para fotografar ou enviar imagem</p>
+          </div>
+          <img id="previewImg" class="hidden" alt="Pré-visualização do documento" />
+        </div>
+
+        <div class="doc-types">
+          <p class="label">Tipo do documento</p>
+          <div class="chips" id="docTypeChips"></div>
+        </div>
+
+        <button class="btn btn-primary" id="linkDocBtn" disabled>Vincular ao Prontuário</button>
+      </section>
+
+      <!-- ============ TELA 4: DOCUMENTOS ============ -->
+      <section class="screen" id="screen-docs">
+        <button class="btn-back" data-go="pulseira">‹ Trocar paciente</button>
+        <h2>Documentos do Prontuário</h2>
+        <div class="patient-mini" id="patientMiniDocs"></div>
+
+        <ul class="doc-list" id="docList"></ul>
+        <p class="empty hidden" id="emptyDocs">Nenhum documento vinculado ainda.</p>
+
+        <h3 class="log-title">Histórico de ações</h3>
+        <ul class="log-list" id="logList"></ul>
+      </section>
+
+      <!-- Modal: visualizar imagem -->
+      <div class="modal hidden" id="viewModal">
+        <div class="modal-box">
+          <div class="modal-head">
+            <strong id="viewTitle">Documento</strong>
+            <button class="modal-close" id="viewClose">✕</button>
+          </div>
+          <img id="viewImg" alt="Documento" />
+          <button class="btn btn-primary" id="viewCloseBtn">Fechar</button>
+        </div>
+      </div>
+
+      <!-- Modal: excluir documento -->
+      <div class="modal hidden" id="deleteModal">
+        <div class="modal-box">
+          <div class="modal-head">
+            <strong>Excluir documento</strong>
+            <button class="modal-close" id="delClose">✕</button>
+          </div>
+          <p class="muted">Selecione o motivo da exclusão:</p>
+          <div class="chips vertical" id="reasonChips"></div>
+          <input type="text" id="reasonInput" class="hidden" placeholder="Descreva o motivo…" maxlength="80" />
+          <button class="btn btn-danger" id="confirmDeleteBtn" disabled>Confirmar exclusão</button>
+        </div>
+      </div>
+    </main>
+
+    <!-- Navegação inferior -->
+    <nav class="bottom-nav hidden" id="bottomNav">
+      <button data-go="pulseira" class="nav-btn active">Pulseira</button>
+      <button data-go="docs" class="nav-btn">Documentos</button>
+      <button data-go="scan" class="nav-btn">Escanear</button>
+    </nav>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
