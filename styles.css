@@ -126,7 +126,7 @@ input:focus { border-color: var(--primary); }
 @keyframes scan { 0%,100% { top: 18%; } 50% { top: 78%; } }
 
 .sim-panel { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; }
-.patient-chips { display: flex; flex-direction: column; gap: 8px; margin: 10px 0 14px; }
+.sim-panel .btn { margin-top: 12px; }
 
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .chips.vertical { flex-direction: column; }

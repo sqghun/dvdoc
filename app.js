@@ -24,6 +24,7 @@ const DELETE_REASONS = [
 ];
 
 const SAMPLE_DOCS = {
+  "Documento de Exemplo": (p) => svgDoc("DOC", "Documento de Exemplo", `Exame digitalizado — paciente ${p.name}`),
   "Eletrocardiograma": (p) => svgDoc("ECG", "Eletrocardiograma", `Derivação II — paciente ${p.name}`),
   "Exame Externo": (p) => svgDoc("RX", "Exame Externo", `Raio-X de tórax — paciente ${p.name}`),
   "Termo de Consentimento": (p) => svgDoc("TC", "Termo de Consentimento", `Consentimento para procedimento — ${p.name}`),
@@ -113,17 +114,19 @@ $("biometricBtn").addEventListener("click", () => {
 });
 
 /* ============ Pulseira ============ */
-function renderPatientChips() {
-  const box = $("patientChips");
-  box.innerHTML = "";
-  PATIENTS.forEach((p, i) => {
-    const b = document.createElement("button");
-    b.type = "button";
-    b.className = "chip" + (i === state.patientIndex ? " selected" : "");
-    b.textContent = `${p.name} — ${p.bed}`;
-    b.onclick = () => { state.patientIndex = i; renderPatientChips(); };
-    box.appendChild(b);
+function seedDocuments(p) {
+  const mk = (type, hoursAgo, user) => ({
+    id: "seed-" + type,
+    type,
+    image: SAMPLE_DOCS[type](p),
+    user,
+    time: new Date(Date.now() - hoursAgo * 3600e3).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }),
+    synced: true,
   });
+  return [
+    mk("Eletrocardiograma", 26, "Dr. Rafael Lima"),
+    mk("Termo de Consentimento", 5, PROFESSIONAL.name),
+  ];
 }
 
 function resetPatientCard() {
@@ -135,9 +138,10 @@ function resetPatientCard() {
 function simulateScan() {
   $("scanStatus").textContent = "Lendo código de barras…";
   setTimeout(() => {
+    state.patientIndex = (state.patientIndex + 1) % PATIENTS.length;
     const p = PATIENTS[state.patientIndex];
     state.patient = p;
-    state.documents = [];
+    state.documents = seedDocuments(p);
     state.log = [];
     $("pcName").textContent = p.name;
     $("pcBed").textContent = p.bed;
@@ -205,20 +209,15 @@ $("fileInput").addEventListener("change", (e) => {
   reader.readAsDataURL(file);
 });
 
-/* Documento de exemplo gerado localmente */
-const sampleArea = document.createElement("div");
-sampleArea.className = "chips";
-sampleArea.style.marginTop = "12px";
-sampleArea.innerHTML = '<span class="label" style="width:100%">ou usar documento de exemplo:</span>';
-DOC_TYPES.forEach((t) => {
-  const b = document.createElement("button");
-  b.type = "button";
-  b.className = "chip small";
-  b.textContent = "Ex.: " + t;
-  b.onclick = () => setPreview(SAMPLE_DOCS[t](state.patient || PATIENTS[0]));
-  sampleArea.appendChild(b);
-});
-document.querySelector(".capture-area").after(sampleArea);
+/* Botão: usar documento de exemplo */
+const sampleBtn = document.createElement("button");
+sampleBtn.type = "button";
+sampleBtn.className = "btn btn-biometric";
+sampleBtn.style.margin = "12px 0 0";
+sampleBtn.textContent = "Usar documento de exemplo";
+sampleBtn.onclick = () =>
+  setPreview(SAMPLE_DOCS["Documento de Exemplo"](state.patient || PATIENTS[0]));
+document.querySelector(".capture-area").after(sampleBtn);
 
 $("linkDocBtn").addEventListener("click", () => {
   if (!state.pendingImage || !state.docType) return;
@@ -366,6 +365,5 @@ document.querySelectorAll(".btn-back").forEach((b) => {
 });
 
 /* ============ Init ============ */
-renderPatientChips();
 renderDocTypeChips();
 renderLog();
